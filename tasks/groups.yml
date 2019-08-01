@@ -1,0 +1,21 @@
+### users-init/tasks/groups.yml -- Tasks to create groups on a system.
+
+### Commentary:
+### Code:
+---
+
+- name: creating system groups
+  group:
+    name: "{{ item }}"
+    state: "present"
+    system: yes
+  loop: "{{ users_init_system_groups }}"
+
+- name: creating user groups
+  group:
+    name: "{{ item }}"
+    state: "present"
+    system: no
+  loop: "{{ users_init_user_groups }}"
+
+### users-init/tasks/groups.yml ends here

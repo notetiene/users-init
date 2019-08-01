@@ -1,0 +1,14 @@
+### users-init/tasks/main.yml -- Tasks to create users and groups on a
+### system.
+
+### Commentary:
+### Code:
+---
+
+- name:
+  block:
+    - include_tasks: groups.yml
+    - include_tasks: users.yml
+    - include_tasks: users_ssh_key.yml
+
+### users-init/tasks/main.yml ends here

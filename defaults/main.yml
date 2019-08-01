@@ -1,0 +1,22 @@
+---
+# defaults file for users-init
+
+users_init_password_lock_default: no
+users_init_create_home_default: yes
+users_init_move_home_default: no
+users_init_shell_default: "/bin/bash"
+users_init_generate_ssh_key_default: no
+users_init_non_unique_default: no
+users_init_expires_default: -1
+users_init_ssh_key_force_default: no
+users_init_ssh_key_bits_default: 4096
+
+users_init_sysuser_password_lock_default: yes
+users_init_sysuser_create_home_default: no
+users_init_sysuser_move_home_default: no
+users_init_sysuser_shell_default: "/bin/bash"
+users_init_sysuser_generate_ssh_key_default: no
+users_init_sysuser_non_unique_default: no
+users_init_sysuser_expires_default: -1
+users_init_sysuser_ssh_key_force_default: no
+users_init_sysuser_ssh_key_bits_default: 4096

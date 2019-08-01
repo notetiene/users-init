@@ -1,0 +1,68 @@
+### users-init/tasks/users_ssh_key.yml -- Tasks to create ssh user
+### keys on a system.
+
+### Commentary:
+
+# TODO
+
+### Code:
+---
+
+- name: creating user ssh keys
+  user:
+    name: "{{ item.name }}"
+    state: "present"
+    generate_ssh_key: yes
+    force: "{{ item.ssh_key.force | default(users_init_ssh_key_force_default) }}"
+    ssh_key_bits: "{{ item.ssh_key.ssh_key_bits | default(users_init_ssh_key_bits_default) }}"
+    ssh_key_comment: "{{ item.ssh_key.comment | default(omit) }}"
+    ssh_key_file: "{{ item.ssh_key.ssh_key_file | default(omit) }}"
+    ssh_key_passphrase: "{{ item.ssh_key.ssh_key_passphrase | default(omit) }}"
+    ssh_key_type: "{{ item.ssh_key.ssh_key_type }}"
+  loop: "{{ users_init_users | dict2items(key_name='name', value_name='value') | json_query(query) }}"
+  register: users_init_users_ssh
+  vars:
+    query: "[?type(value.ssh_key) != 'null'].{name: name, ssh_key: value.ssh_key}"
+
+- name: creating system user ssh keys
+  user:
+    name: "{{ item.name }}"
+    state: "present"
+    generate_ssh_key: yes
+    force: "{{ item.ssh_key.force | default(users_init_sysuser_ssh_key_force_default) }}"
+    ssh_key_bits: "{{ item.ssh_key.ssh_key_bits | default(users_init_sysuser_ssh_key_bits_default) }}"
+    ssh_key_comment: "{{ item.ssh_key.comment | default(omit) }}"
+    ssh_key_file: "{{ item.ssh_key.ssh_key_file | default(omit) }}"
+    ssh_key_passphrase: "{{ item.ssh_key.ssh_key_passphrase | default(omit) }}"
+    ssh_key_type: "{{ item.ssh_key.ssh_key_type }}"
+  loop: "{{ users_init_system_users | dict2items(key_name='name', value_name='value') | json_query(query) }}"
+  register: users_init_sysusers_ssh
+  vars:
+    query: "[?type(value.ssh_key) != 'null'].{name: name, ssh_key: value.ssh_key}"
+
+- debug:
+    msg: 
+      - "IMPORTANT: “{{ item.name }}” user SSH key fingerprint:"
+      - "{{ item.ssh_fingerprint }}"
+  loop: "{{ users_init_users_ssh | json_query(query) }}"
+  vars:
+    query: "results[?type(ssh_fingerprint) != 'null'].{name: name, ssh_fingerprint: ssh_fingerprint}"
+
+- debug:
+    msg: 
+      - "IMPORTANT: “{{ item.name }}” system user SSH key fingerprint:"
+      - "{{ item.ssh_fingerprint }}"
+  loop: "{{ users_init_sysusers_ssh | json_query(query) }}"
+  vars:
+    query: "results[?type(ssh_fingerprint) != 'null'].{name: name, ssh_fingerprint: ssh_fingerprint}"
+
+- name: adding authorized public keys
+  authorized_key:
+    user: "{{ item.0.name }}"
+    state: "present"
+    key: "{{lookup('file', item.1 )}}"
+  loop: "{{users_init_system_users | combine(users_init_users) | dict2items(key_name='name', value_name='value') | json_query(query) | subelements('key')}}"
+  vars:
+    query: "[?type(value.authorized_keys) != 'null'].{name: name, key: value.authorized_keys}"
+
+### users-init/tasks/users_ssh_key.yml ends here

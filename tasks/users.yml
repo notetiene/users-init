@@ -1,0 +1,58 @@
+### users-init/tasks/users.yml -- Tasks to create users on a system.
+
+### Commentary:
+### Code:
+---
+
+- name: 
+  group:
+    name: "{{ item }}"
+    state: "present"
+    system: yes
+  loop: "{{ users_init_system_groups }}"
+
+- name: creating non-system users
+  user:
+    name: "{{ item.name }}"
+    system: no
+    comment: "{{ item.value.comment | default(omit) }}"
+    group: "{{ item.value.group | default(omit) }}"
+    groups: "{{ item.value.groups | default(omit) }}"
+    seuser: "{{ item.value.seuser | default(omit) }}"
+    password: "{{ item.value.password | default(omit) }}"
+    update_password: "always"
+    password_lock: "{{ item.value.password_lock | default(users_init_password_lock_default) }}"
+    home: "{{item.value.home | default(omit) }}"
+    skeleton: "{{ item.value.skeleton | default(omit) }}"
+    create_home: "{{ item.value.create_home | default(users_init_create_home_default) }}"
+    move_home: "{{item.value.move_home | default(users_init_move_home_default) }}"
+    shell: "{{ item.value.shell | default(users_init_shell_default) }}"
+    expires: "{{ item.value.expires | default(users_init_expires_default) }}"
+    generate_ssh_key: "{{ item.value.generate_ssh_key | default(users_init_generate_ssh_key_default) }}"
+    uid: "{{ item.value.uid | default(omit) }}"
+    non_unique: "{{ item.value.non_unique | default(users_init_non_unique_default)}}"
+  loop: "{{ users_init_system_users | dict2items(key_name='name', value_name='value') }}"
+
+- name: creating system users
+  user:
+    name: "{{ item.name }}"
+    system: yes
+    comment: "{{ item.value.comment | default(omit) }}"
+    group: "{{ item.value.group | default(omit) }}"
+    groups: "{{ item.value.groups | default(omit) }}"
+    seuser: "{{ item.value.seuser | default(omit) }}"
+    password: "{{ item.value.password | default(omit) }}"
+    update_password: "always"
+    password_lock: "{{ item.value.password_lock | default(users_init_sysuser_password_lock_default) }}"
+    home: "{{item.value.home | default(omit) }}"
+    skeleton: "{{ item.value.skeleton | default(omit) }}"
+    create_home: "{{ item.value.create_home | default(users_init_sysuser_create_home_default) }}"
+    move_home: "{{item.value.move_home | default(users_init_sysuser_move_home_default) }}"
+    shell: "{{ item.value.shell | default(users_init_sysuser_shell_default) }}"
+    expires: "{{ item.value.expires | default(users_init_sysuser_expires_default) }}"
+    generate_ssh_key: "{{ item.value.generate_ssh_key | default(users_init_sysuser_generate_ssh_key_default) }}"
+    uid: "{{ item.value.uid | default(omit) }}"
+    non_unique: "{{ item.value.non_unique | default(users_init_sysuser_non_unique_default)}}"
+  loop: "{{ users_init_sysuser_users | dict2items(key_name='name', value_name='value') }}"
+
+### users-init/tasks/users.yml ends here
